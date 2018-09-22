@@ -13,6 +13,8 @@ import net.dean.jraw.models.Comment
 import net.dean.jraw.oauth.Credentials
 import net.dean.jraw.oauth.OAuthHelper
 
+private val config = getConfig()
+
 fun main(args: Array<String>) {
     println("Hello World")
     val bot = SlayTheSpireCardBot()
@@ -20,12 +22,11 @@ fun main(args: Array<String>) {
     while (true) {
         println("Processing comments")
         bot.processComments()
-        Thread.sleep(15000)
+        Thread.sleep(1000 * config.sleepCycleSeconds.toLong())
     }
 }
 
 class SlayTheSpireCardBot {
-    private val config = getConfig()
     private val client: RedditClient
     private val user: String
     private val subreddits = config.subreddits

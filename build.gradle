@@ -1,0 +1,42 @@
+buildscript {
+    ext.kotlin_version = '1.2.70'
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.plugin-shadow'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+group = "com.tanelso2.slaythespirecardbot"
+version = "1.0-SNAPSHOT"
+mainClassName = "com.tanelso2.slaythespirecardbot.MainKt"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compile("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.9.4")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.4")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4.1")
+    implementation("net.dean.jraw:JRAW:1.1.0")
+    implementation("org.jooq:jooq-codegen:3.11.5")
+    implementation("org.jooq:jooq-meta:3.11.5")
+    implementation("org.jooq:jooq:3.11.5")
+    implementation("org.postgresql:postgresql:42.2.5")
+    testCompile("org.jetbrains.kotlin:kotlin-test")
+    testCompile("org.jetbrains.kotlin:kotlin-test-junit")
+}
