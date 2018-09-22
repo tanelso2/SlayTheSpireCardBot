@@ -1,4 +1,2 @@
 sudo: false
 language: java
-script:
-- "./gradlew clean build"
