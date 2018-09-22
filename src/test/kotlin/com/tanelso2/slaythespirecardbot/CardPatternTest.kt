@@ -44,4 +44,13 @@ class CardPatternTest {
         assertEquals(2, result.size)
     }
 
+    @Test
+    fun getCardsTest_hardCards() {
+        val card1 = "Ascender's Bane"
+        val card2 = "J.A.X."
+        val body = "[[$card1]] and [[$card2]]"
+        val result = getCards(body)
+        assertEquals(2, result.size)
+    }
+
 }

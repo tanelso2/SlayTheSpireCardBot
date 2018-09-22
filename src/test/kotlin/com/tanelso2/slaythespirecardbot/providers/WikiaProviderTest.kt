@@ -8,12 +8,15 @@ class WikiaProviderTest {
 
     @Test
     fun getCardNameTitleTest() {
-        val x = mapOf(
+        val cases = mapOf(
                 "Bash" to "Bash",
                 "Piercing Wail" to "Piercing_Wail",
                 "leg sweep" to "Leg_Sweep",
-                "a thousand Cuts" to "A_Thousand_Cuts"
+                "a thousand Cuts" to "A_Thousand_Cuts",
+                "Dodge And Roll" to "Dodge_and_Roll"
         )
-        x.forEach {(input, expected) -> assertEquals(expected, getCardNameTitle(input))}
+        cases.forEach { (input, expected) ->
+            assertEquals(expected, getCardNameTitle(input))
+        }
     }
 }
