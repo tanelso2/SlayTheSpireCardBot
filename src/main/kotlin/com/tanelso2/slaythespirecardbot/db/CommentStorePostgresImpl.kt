@@ -11,8 +11,23 @@ class CommentStorePostgresImpl(private val config: PostgresConfig): CommentStore
 
     private val url = "jdbc:postgresql://${config.host}:${config.port}/${config.database}"
     private val conn = DriverManager.getConnection(url, config.username, config.password)
-    private val IS_PROCESSED_STMT = "SELECT COUNT(*) FROM comments WHERE id = ?"
-    private val STORE_COMMENT_STATEMENT = "INSERT INTO comments (id) VALUES (?)"
+
+    companion object {
+        private val IS_PROCESSED_STMT = "SELECT COUNT(*) FROM comments WHERE comment_id = ?"
+        private val STORE_COMMENT_STATEMENT = "INSERT INTO comments (comment_id) VALUES (?)"
+        private val initStatments = listOf(
+            "CREATE TABLE IF NOT EXISTS comments(comment_id VARCHAR(64) NOT NULL PRIMARY KEY)"
+
+        )
+    }
+
+    init {
+        conn.createStatement().use { stmt ->
+            for (initStatment in initStatments) {
+                stmt.execute(initStatment)
+            }
+        }
+    }
 
     override fun isCommentProcessed(commentId: String): Boolean {
         conn.prepareStatement(IS_PROCESSED_STMT).use { stmt ->
@@ -36,7 +51,7 @@ class CommentStorePostgresImpl(private val config: PostgresConfig): CommentStore
 fun main(args: Array<String>) {
     val config = getConfig()
     val commentStore: CommentStore = CommentStorePostgresImpl(config.postgres)
-    val commentId = "testing2"
+    val commentId = "testing3"
     assert(!commentStore.isCommentProcessed(commentId))
     commentStore.storeComment(commentId)
     assert(commentStore.isCommentProcessed(commentId))
