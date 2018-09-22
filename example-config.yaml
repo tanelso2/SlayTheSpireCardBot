@@ -3,11 +3,11 @@ reddit:
   password: hunter2
   clientId: xxxxxxxx
   clientSecret: yyyyyyy
-  database: postgres
 postgres:
   host: localhost
   port: 5432
   username: postgres
   password: guest
+  database: postgres
 subreddits:
   - stscardbottest
