@@ -14,12 +14,15 @@ repositories {
 }
 
 dependencies {
-    compile(kotlin("reflect"))
     compile(kotlin("stdlib-jdk8"))
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.7.1-1")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.7.1")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.7.1-2")
+    compile(kotlin("reflect"))
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.9.4")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.4")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4.1")
     implementation("net.dean.jraw:JRAW:1.1.0")
+    implementation("org.jooq:jooq-codegen:3.11.5")
+    implementation("org.jooq:jooq-meta:3.11.5")
+    implementation("org.jooq:jooq:3.11.5")
     implementation("org.postgresql:postgresql:42.2.5")
     testCompile("junit", "junit", "4.12")
     testCompile(kotlin("test"))

@@ -7,11 +7,11 @@ import java.util.concurrent.ConcurrentHashMap
 class CommentStoreInMemoryImpl: CommentStore {
     val set: MutableSet<String> = Collections.newSetFromMap(ConcurrentHashMap())
 
-    override fun storeComment(comment: Comment) {
-        set.add(comment.id)
+    override fun storeComment(commentId: String) {
+        set.add(commentId)
     }
 
-    override fun isCommentProcessed(comment: Comment): Boolean {
-        return set.contains(comment.id)
+    override fun isCommentProcessed(commentId: String): Boolean {
+        return set.contains(commentId)
     }
 }

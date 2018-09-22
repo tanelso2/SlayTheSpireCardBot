@@ -4,6 +4,7 @@ import com.tanelso2.slaythespirecardbot.CardPattern.getCards
 import com.tanelso2.slaythespirecardbot.config.getConfig
 import com.tanelso2.slaythespirecardbot.db.CommentStore
 import com.tanelso2.slaythespirecardbot.db.CommentStoreInMemoryImpl
+import com.tanelso2.slaythespirecardbot.db.CommentStorePostgresImpl
 import com.tanelso2.slaythespirecardbot.providers.WikiaProvider
 import net.dean.jraw.RedditClient
 import net.dean.jraw.http.OkHttpNetworkAdapter
@@ -28,7 +29,7 @@ class SlayTheSpireCardBot {
     private val client: RedditClient
     private val user: String
     private val subreddits = config.subreddits
-    private val commentStore: CommentStore = CommentStoreInMemoryImpl()
+    private val commentStore: CommentStore = CommentStorePostgresImpl(config.postgres)
     init {
         val redditApiConfig = config.reddit
         user = redditApiConfig.username
