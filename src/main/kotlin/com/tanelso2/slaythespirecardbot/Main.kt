@@ -31,6 +31,9 @@ class SlayTheSpireCardBot {
     private val user: String
     private val subreddits = config.subreddits
     private val commentStore: CommentStore = CommentStorePostgresImpl(config.postgres)
+    private val footer = "Please report bugs at /r/stscardbottest"
+            .split(" ")
+            .joinToString(" ^^^", prefix = "\n\n^^^")
     init {
         val redditApiConfig = config.reddit
         user = redditApiConfig.username
@@ -77,7 +80,7 @@ class SlayTheSpireCardBot {
             println(cards)
             val reply = cards
                     .map { WikiaProvider.getMessage(it) }
-                    .joinToString("\n\n")
+                    .joinToString("\n\n", postfix = footer)
             postReply(comment, reply)
         }
         commentStore.storeComment(comment)

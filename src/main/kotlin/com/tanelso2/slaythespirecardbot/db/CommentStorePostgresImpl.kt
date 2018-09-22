@@ -15,7 +15,7 @@ class CommentStorePostgresImpl(private val config: PostgresConfig): CommentStore
     companion object {
         private val IS_PROCESSED_STMT = "SELECT COUNT(*) FROM comments WHERE comment_id = ?"
         private val STORE_COMMENT_STATEMENT = "INSERT INTO comments (comment_id) VALUES (?)"
-        private val initStatments = listOf(
+        private val initStatements = listOf(
             "CREATE TABLE IF NOT EXISTS comments(comment_id VARCHAR(64) NOT NULL PRIMARY KEY)"
 
         )
@@ -23,7 +23,7 @@ class CommentStorePostgresImpl(private val config: PostgresConfig): CommentStore
 
     init {
         conn.createStatement().use { stmt ->
-            for (initStatment in initStatments) {
+            for (initStatment in initStatements) {
                 stmt.execute(initStatment)
             }
         }
