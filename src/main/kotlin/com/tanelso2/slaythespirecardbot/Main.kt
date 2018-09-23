@@ -14,6 +14,7 @@ import net.dean.jraw.oauth.OAuthHelper
 
 private val config = getConfig()
 
+// TODO: This file could really use some cleanup
 fun main(args: Array<String>) {
     println("Hello World")
     val bot = SlayTheSpireCardBot()
@@ -79,7 +80,7 @@ class SlayTheSpireCardBot {
     }
 
     fun processComment(comment: Comment) {
-        println("Processing comment ${comment.id}")
+        //println("Processing comment ${comment.id}")
         val cards = getCards(comment.body)
         if (cards.isNotEmpty()) {
             println(cards)
@@ -88,8 +89,8 @@ class SlayTheSpireCardBot {
                     .joinToString("\n\n", postfix = footer)
             if (commentingAllowed) {
                 postReply(comment, reply)
+                commentStore.storeComment(comment)
             }
         }
-        commentStore.storeComment(comment)
     }
 }
