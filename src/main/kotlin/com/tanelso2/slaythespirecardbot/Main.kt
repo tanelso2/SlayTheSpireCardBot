@@ -3,7 +3,6 @@ package com.tanelso2.slaythespirecardbot
 import com.tanelso2.slaythespirecardbot.CardPattern.getCards
 import com.tanelso2.slaythespirecardbot.config.getConfig
 import com.tanelso2.slaythespirecardbot.db.CommentStore
-import com.tanelso2.slaythespirecardbot.db.CommentStoreInMemoryImpl
 import com.tanelso2.slaythespirecardbot.db.CommentStorePostgresImpl
 import com.tanelso2.slaythespirecardbot.providers.WikiaProvider
 import net.dean.jraw.RedditClient
@@ -22,21 +21,24 @@ fun main(args: Array<String>) {
     while (true) {
         println("Processing comments")
         bot.processComments()
+        println("Done processing. Going to bed")
         Thread.sleep(1000 * config.sleepCycleSeconds.toLong())
     }
 }
 
 class SlayTheSpireCardBot {
     private val client: RedditClient
-    private val user: String
+    private val user: String = config.reddit.username
     private val subreddits = config.subreddits
+    private val commentingAllowed: Boolean = config.reddit.commentingAllowed
+    private val commentLimit = config.reddit.commentLimit
     private val commentStore: CommentStore = CommentStorePostgresImpl(config.postgres)
     private val footer = "Please report bugs at /r/stscardbottest"
             .split(" ")
             .joinToString(" ^^^", prefix = "\n\n^^^")
+
     init {
         val redditApiConfig = config.reddit
-        user = redditApiConfig.username
         val creds = Credentials.script(
                 username = redditApiConfig.username,
                 password = redditApiConfig.password,
@@ -47,24 +49,27 @@ class SlayTheSpireCardBot {
     }
 
     fun postReply(parent: Comment, body: String) {
+        println("Posting reply to ${parent.id}")
         parent.toReference(client).reply(body)
     }
 
     fun processComments() {
-        subreddits.forEach { processSubreddit(it) }
+        subreddits.parallelStream().forEach {
+            processSubreddit(it)
+        }
     }
 
     fun processSubreddit(subreddit: String) {
         val subredditRef = client.subreddit(subreddit)
-        val builder = subredditRef.comments()
-        val built = builder.build()
-        built.forEach {
-            val stream = it.parallelStream()
-            stream
-                    .filter { it.author != user }
-                    .filter { isCommentProcessed(it) }
-                    .forEach { processComment(it) }
-        }
+        subredditRef.comments()
+                .limit(commentLimit)
+                .build()
+                .forEach {
+                    it.parallelStream()
+                            .filter { it.author != user }
+                            .filter { isCommentProcessed(it) }
+                            .forEach { processComment(it) }
+                }
     }
 
     fun isCommentProcessed(comment: Comment): Boolean {
@@ -74,14 +79,15 @@ class SlayTheSpireCardBot {
 
     fun processComment(comment: Comment) {
         println("Processing comment ${comment.id}")
-        println(comment)
         val cards = getCards(comment.body)
         if (cards.isNotEmpty()) {
             println(cards)
             val reply = cards
                     .map { WikiaProvider.getMessage(it) }
                     .joinToString("\n\n", postfix = footer)
-            postReply(comment, reply)
+            if (commentingAllowed) {
+                postReply(comment, reply)
+            }
         }
         commentStore.storeComment(comment)
     }
