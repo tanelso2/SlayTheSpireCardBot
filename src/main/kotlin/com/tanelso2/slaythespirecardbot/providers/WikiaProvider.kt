@@ -28,6 +28,7 @@ object WikiaProvider: Provider {
     // Or just shortcuts for commonly messed up names
     private val oddballs: Map<String, String> = mapOf(
             "auto shields" to "Auto-Shields",
+            "blood for blood" to "Blood_for_Blood",
             "creative ai" to "Creative_AI",
             "dodge and roll" to "Dodge_and_Roll",
             "flash of steel" to "Flash_of_Steel",
