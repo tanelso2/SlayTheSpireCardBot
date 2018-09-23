@@ -38,6 +38,7 @@ class SlayTheSpireCardBot {
             .joinToString(" ^^^", prefix = "\n\n^^^")
 
     init {
+        println(if (commentingAllowed) "Commenting Allowed!" else "Commenting not allowed")
         val redditApiConfig = config.reddit
         val creds = Credentials.script(
                 username = redditApiConfig.username,
