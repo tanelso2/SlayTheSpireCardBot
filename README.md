@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/tanelso2/SlayTheSpireCardBot.svg?branch=master)](https://travis-ci.com/tanelso2/SlayTheSpireCardBot)
+[![codecov](https://codecov.io/gh/tanelso2/SlayTheSpireCardBot/branch/master/graph/badge.svg)](https://codecov.io/gh/tanelso2/SlayTheSpireCardBot)
 
 # Slay the Spire Card Bot
 
