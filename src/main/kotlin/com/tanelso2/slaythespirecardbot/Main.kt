@@ -1,14 +1,14 @@
 package com.tanelso2.slaythespirecardbot
 
-import com.tanelso2.slaythespirecardbot.CardPattern.getCards
 import com.tanelso2.slaythespirecardbot.config.getConfig
 import com.tanelso2.slaythespirecardbot.db.CommentStore
-import com.tanelso2.slaythespirecardbot.db.CommentStorePostgresImpl
-import com.tanelso2.slaythespirecardbot.providers.WikiaProvider
+import com.tanelso2.slaythespirecardbot.db.DBPostgresImpl
+import com.tanelso2.slaythespirecardbot.db.PostStore
+import com.tanelso2.slaythespirecardbot.processors.CommentProcessor
+import com.tanelso2.slaythespirecardbot.processors.PostProcessor
 import net.dean.jraw.RedditClient
 import net.dean.jraw.http.OkHttpNetworkAdapter
 import net.dean.jraw.http.UserAgent
-import net.dean.jraw.models.Comment
 import net.dean.jraw.oauth.Credentials
 import net.dean.jraw.oauth.OAuthHelper
 
@@ -20,8 +20,8 @@ fun main(args: Array<String>) {
     val bot = SlayTheSpireCardBot()
 
     while (true) {
-        println("Processing comments")
-        bot.processComments()
+        println("Processing subreddits")
+        bot.processSubreddits()
         println("Done processing. Going to bed")
         Thread.sleep(1000 * config.sleepCycleSeconds.toLong())
     }
@@ -29,14 +29,13 @@ fun main(args: Array<String>) {
 
 class SlayTheSpireCardBot {
     private val client: RedditClient
-    private val user: String = config.reddit.username
     private val subreddits = config.subreddits
     private val commentingAllowed: Boolean = config.reddit.commentingAllowed
     private val commentLimit = config.reddit.commentLimit
-    private val commentStore: CommentStore = CommentStorePostgresImpl(config.postgres)
-    private val footer = "Please report bugs at /r/stscardbottest"
-            .split(" ")
-            .joinToString(" ^^^", prefix = "\n\n^^^")
+    private val postLimit = config.reddit.postLimit
+    private val db = DBPostgresImpl(config.postgres)
+    private val commentStore: CommentStore = db
+    private val postStore: PostStore = db
 
     init {
         println(if (commentingAllowed) "Commenting Allowed!" else "Commenting not allowed")
@@ -50,12 +49,18 @@ class SlayTheSpireCardBot {
         client = OAuthHelper.automatic(OkHttpNetworkAdapter(userAgent), creds)
     }
 
-    fun postReply(parent: Comment, body: String) {
-        println("Posting reply to ${parent.id}")
-        parent.toReference(client).reply(body)
-    }
+    private val commentProcessor = CommentProcessor(
+            commentStore,
+            client,
+            commentLimit = commentLimit,
+            commentingAllowed = commentingAllowed)
+    private val postProcessor = PostProcessor(
+            postStore,
+            client,
+            postLimit = postLimit,
+            commentingAllowed = commentingAllowed)
 
-    fun processComments() {
+    fun processSubreddits() {
         subreddits.parallelStream().forEach {
             processSubreddit(it)
         }
@@ -63,34 +68,9 @@ class SlayTheSpireCardBot {
 
     fun processSubreddit(subreddit: String) {
         val subredditRef = client.subreddit(subreddit)
-        subredditRef.comments()
-                .limit(commentLimit)
-                .build()
-                .forEach {
-                    it.parallelStream()
-                            .filter { it.author != user }
-                            .filter { isCommentProcessed(it) }
-                            .forEach { processComment(it) }
-                }
+        // TODO: Parallelize this?
+        commentProcessor.processSubreddit(subredditRef)
+        postProcessor.processSubreddit(subredditRef)
     }
 
-    fun isCommentProcessed(comment: Comment): Boolean {
-        // TODO: See if this user has already replied to comment
-        return !commentStore.isCommentProcessed(comment)
-    }
-
-    fun processComment(comment: Comment) {
-        //println("Processing comment ${comment.id}")
-        val cards = getCards(comment.body)
-        if (cards.isNotEmpty()) {
-            println(cards)
-            val reply = cards
-                    .map { WikiaProvider.getMessage(it) }
-                    .joinToString("\n\n", postfix = footer)
-            if (commentingAllowed) {
-                postReply(comment, reply)
-                commentStore.storeComment(comment)
-            }
-        }
-    }
 }

@@ -20,7 +20,8 @@ data class RedditApiConfig(
         val clientId: String,
         val clientSecret: String,
         val commentingAllowed: Boolean = false,
-        val commentLimit: Int = 1000)
+        val commentLimit: Int = 1000,
+        val postLimit: Int = 100)
 
 data class Config(
         val postgres: PostgresConfig,
